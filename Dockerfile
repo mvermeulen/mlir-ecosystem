@@ -11,16 +11,10 @@ RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/nul
 RUN apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
 RUN apt update && apt install -y cmake
 
-# pybind11
-#RUN git clone https://github.com/pybind/pybind11
-#RUN pip3 install pytest
-#RUN cd pybind11 && git checkout v2.8.1 && mkdir build && cd build && cmake .. && make -j && make install
-
 WORKDIR /workspace
 
 # Fetch sources
 RUN git clone https://github.com/llvm/torch-mlir
-RUN ln -s torch-mlir torch_mlir
 RUN cd torch-mlir && git submodule update --init
 
 # Set up Python VirtualEnvironment (see https://pythonspeed.com/articles/activate-virtualenv-dockerfile/)
@@ -47,4 +41,6 @@ RUN cd torch-mlir && cmake -GNinja -Bbuild \
 
 # Build everything (including LLVM)
 RUN cd torch-mlir && cmake --build build
+
+ENV PYTHONPATH=/workspace/torch-mlir/build/tools/torch-mlir/python_packages/torch_mlir:/workspace/torch-mlir/examples
 COPY run_demo.sh /workspace/run_demo.sh
