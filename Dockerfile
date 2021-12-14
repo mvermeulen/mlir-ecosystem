@@ -20,6 +20,7 @@ WORKDIR /workspace
 
 # Fetch sources
 RUN git clone https://github.com/llvm/torch-mlir
+RUN ls -s torch-mlir torch_mlir
 RUN cd torch-mlir && git submodule update --init
 
 # Set up Python VirtualEnvironment (see https://pythonspeed.com/articles/activate-virtualenv-dockerfile/)
@@ -46,3 +47,4 @@ RUN cd torch-mlir && cmake -GNinja -Bbuild \
 
 # Build everything (including LLVM)
 RUN cd torch-mlir && cmake --build build
+COPY run_demo.sh /workspace/run_demo.sh
