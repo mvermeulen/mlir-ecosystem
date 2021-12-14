@@ -1,3 +1,4 @@
-Directory for experimenting with torch-mlir.
+Recipes and pointers for building end-to-end ecosystems.
 
-Based on Ubuntu 18.04 since 20.04 seemed to have difficulties with Python environment.
+These are mostly pointers to existing repos, but also then contain scripts
+and documents I use for my own experimentation.
