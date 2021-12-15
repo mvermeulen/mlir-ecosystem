@@ -32,6 +32,6 @@ RUN cd llvm-project-mlir && mkdir build && cd build && cmake -G Ninja .. \
 RUN cd llvm-project-mlir/build && cmake --build . --target check-mlir
 
 # regression tests
-#RUN cd llvm-project-mlir/build && cmake --build . --target check-mlir-miopen
+RUN cd llvm-project-mlir/build && cmake --build . --target check-mlir-miopen
 
 COPY run_tests.sh /workspace/run_tests.sh
