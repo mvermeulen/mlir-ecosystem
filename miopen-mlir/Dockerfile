@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # do not fool rocm_agent_enumerator
 # RUN rm /opt/rocm/bin/target.lst
 
-RUN apt update && apt install -y build-essential lsb-release libssl-dev software-properties-common wget
+RUN apt update && apt install -y build-essential git lsb-release libssl-dev ninja-build software-properties-common wget
 
 WORKDIR /workspace
 
@@ -24,7 +24,6 @@ RUN cd llvm-project-mlir && mkdir build && cd build && cmake -G Ninja .. \
    -DLLVM_ENABLE_ASSERTIONS=ON \
    -DBUILD_SHARED_LIBS=ON \
    -DLLVM_BUILD_LLVM_DYLIB=ON \
-   -DLLVM_PARALLEL_LINK_JOBS=2 \
    -DMLIR_ROCM_RUNNER_ENABLED=1 \
    -DMLIR_MIOPEN_DRIVER_ENABLED=1 \
    -DMLIR_ENABLE_SQLITE=1
@@ -32,7 +31,7 @@ RUN cd llvm-project-mlir && mkdir build && cd build && cmake -G Ninja .. \
 # sanity test
 RUN cd llvm-project-mlir/build && cmake --build . --target check-mlir
 
-# end to end test
-RUN cd llvm-project-mlir/build && ./bin/mlir-miopen-driver -p -ph -c | ./bin/mlir-rocm-runner --shared-libs=./lib/librocm-runtime-wrap
+# regression tests
+#RUN cd llvm-project-mlir/build && cmake --build . --target check-mlir-miopen
 
 COPY run_tests.sh /workspace/run_tests.sh
