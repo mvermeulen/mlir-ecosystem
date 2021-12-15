@@ -1,14 +1,16 @@
-FROM ubuntu:18.04
+FROM rocm/dev-ubuntu-18.04:4.5
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && apt install -y git ninja-build wget
+# do not fool rocm_agent_enumerator
+# RUN rm /opt/rocm/bin/target.lst
 
-# update cmake
-RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearm | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
-RUN apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main"
-RUN apt update && apt install -y cmake
+RUN apt update && apt install -y build-essential lsb-release libssl-dev software-properties-common wget
 
 WORKDIR /workspace
+
+# update cmake
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1.tar.gz && tar xf cmake-3.22.1.tar.gz && cd cmake-3.22.1 && ./configure && make && make install
+RUN rm cmake-3.22.1.tar.gz
 
 # clone repository
 RUN git clone -b miopen-dialect https://github.com/ROCmSoftwarePlatform/llvm-project-mlir
@@ -26,3 +28,11 @@ RUN cd llvm-project-mlir && mkdir build && cd build && cmake -G Ninja .. \
    -DMLIR_ROCM_RUNNER_ENABLED=1 \
    -DMLIR_MIOPEN_DRIVER_ENABLED=1 \
    -DMLIR_ENABLE_SQLITE=1
+
+# sanity test
+RUN cd llvm-project-mlir/build && cmake --build . --target check-mlir
+
+# end to end test
+RUN cd llvm-project-mlir/build && ./bin/mlir-miopen-driver -p -ph -c | ./bin/mlir-rocm-runner --shared-libs=./lib/librocm-runtime-wrap
+
+COPY run_tests.sh /workspace/run_tests.sh
