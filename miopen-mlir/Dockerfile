@@ -31,7 +31,10 @@ RUN cd llvm-project-mlir && mkdir build && cd build && cmake -G Ninja .. \
 # sanity test
 RUN cd llvm-project-mlir/build && cmake --build . --target check-mlir
 
-# regression tests
+# build some basic tools
 RUN cd llvm-project-mlir/build && cmake --build . --target mlir-miopen-driver
+RUN cd llvm-project-mlir/build && cmake --build . --target mlir-rocm-runner
+RUN cd llvm-project-mlir/build && cmake --build . --target miopen-opt
+RUN cd llvm-project-mlir/build && cmake --build . --target miopen-translate
 
 COPY run_tests.sh /workspace/run_tests.sh
